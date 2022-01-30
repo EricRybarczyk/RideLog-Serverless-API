@@ -1,0 +1,43 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  RideLog-Serverless-API
+  Demo project with AWS Lambda, API Gateway, and DynamoDB
+
+Globals:
+  Function:
+    Timeout: 30
+    Runtime: java11
+    Architectures:
+      - x86_64
+    MemorySize: 512
+
+Resources:
+  CreateRideLogHandlerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: RideLog-Lambda-Functions
+      Handler: dev.ericrybarczyk.ridelog.CreateRideLogHandler::handleRequest
+      Events:
+        RideLogs:
+          Type: Api
+          Properties:
+            Path: /ridelogs
+            Method: Post
+
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  RideLogsStageApi:
+    Description: "API Gateway STAGE endpoint URL to POST a Ride Log"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Stage/ridelogs/"
+  RideLogsProdApi:
+    Description: "API Gateway PRODUCTION endpoint URL to POST a Ride Log"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/ridelogs/"
+  CreateRideLogHandlerFunction:
+    Description: "CreateRideLogHandler Lambda Function ARN"
+    Value: !GetAtt CreateRideLogHandlerFunction.Arn
+  CreateRideLogHandlerFunctionIamRole:
+    Description: "Implicit IAM Role created for CreateRideLogHandler Lambda Function"
+    Value: !GetAtt CreateRideLogHandlerFunction.Arn
