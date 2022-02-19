@@ -6,10 +6,14 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
+import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
+import software.amazon.awssdk.services.dynamodb.model.DynamoDbException;
 import java.net.HttpURLConnection;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 
 public class CreateRideLogHandler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
@@ -20,19 +24,29 @@ public class CreateRideLogHandler implements RequestHandler<APIGatewayProxyReque
         final String requestBody = input.getBody();
         final ObjectMapper objectMapper = new ObjectMapper();
 
+        RideLog rideLog;
         try {
-            final RideLog rideLog = objectMapper.readValue(requestBody, RideLog.class);
+            rideLog = objectMapper.readValue(requestBody, RideLog.class);
+
+            DynamoDbEnhancedClient enhancedClient = DynamoDbEnhancedClient.create();
+
+            DynamoDbTable<RideLog> rideLogsTable = enhancedClient.table("RideLogs", TableSchema.fromBean(RideLog.class));
+
+            rideLogsTable.putItem(rideLog);
+
         } catch (JsonProcessingException e) {
             return new APIGatewayProxyResponseEvent()
                     .withStatusCode(HttpURLConnection.HTTP_BAD_REQUEST)
                     .withBody(e.getMessage());
+        } catch (DynamoDbException e) {
+            return new APIGatewayProxyResponseEvent()
+                    .withStatusCode(HttpURLConnection.HTTP_INTERNAL_ERROR)
+                    .withBody(e.getMessage());
         }
 
-        // TODO: persistence of the RideLog instance
-        final UUID rideLogId = UUID.randomUUID();
-
         final Map<String, String> headers = new HashMap<>();
-        headers.put("Location", "/ridelogs/" + rideLogId.toString());
+        headers.put("Location", String.format("/ridelogs/%s/%s", rideLog.getUserId(),
+                rideLog.getStartDateTime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
 
         return new APIGatewayProxyResponseEvent()
                 .withStatusCode(HttpURLConnection.HTTP_CREATED)

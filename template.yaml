@@ -24,6 +24,28 @@ Resources:
           Properties:
             Path: /ridelogs
             Method: Post
+      Policies:
+        - DynamoDBWritePolicy:
+            TableName: !Ref RideLogTable
+
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-dynamodb-table.html
+  RideLogTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: "userId"
+          AttributeType: "S"
+        - AttributeName: "startDateTime"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "userId"
+          KeyType: "HASH"
+        - AttributeName: "startDateTime"
+          KeyType: "RANGE"
+      ProvisionedThroughput:
+        ReadCapacityUnits: "5"
+        WriteCapacityUnits: "5"
+      TableName: "RideLogs"
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function

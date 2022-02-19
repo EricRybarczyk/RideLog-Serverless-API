@@ -2,9 +2,14 @@ package dev.ericrybarczyk.ridelog;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSortKey;
 import java.time.LocalDateTime;
 
+@DynamoDbBean
 public class RideLog {
+    private String userId;
     private LocalDateTime startDateTime;
     private LocalDateTime endDateTime;
     private double startLatitude;
@@ -15,6 +20,16 @@ public class RideLog {
     private String rideTitle;
     private String rideLocation;
 
+    @DynamoDbPartitionKey
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    @DynamoDbSortKey
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     public LocalDateTime getStartDateTime() {
         return startDateTime;

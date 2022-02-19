@@ -1,5 +1,5 @@
 {
-    "body": "{\"startDateTime\": \"2022-01-25T12:09:42.032367\",\"endDateTime\": \"2022-01-25T14:09:42.03818\",\"startLatitude\": 36.477759,\"startLongitude\": -94.236827,\"endLatitude\": 36.4947,\"endLongitude\": -94.206545,\"distance\": 18.7,\"rideTitle\": \"Fun Ride\",\"rideLocation\": \"Best Trail\"}",
+    "body": "{\"userId\": \"rider@example.com\",\"startDateTime\": \"2022-01-25T12:09:42.032367\",\"endDateTime\": \"2022-01-25T14:09:42.03818\",\"startLatitude\": 36.477759,\"startLongitude\": -94.236827,\"endLatitude\": 36.4947,\"endLongitude\": -94.206545,\"distance\": 18.7,\"rideTitle\": \"Fun Ride\",\"rideLocation\": \"Best Trail\"}",
     "resource": "/{proxy+}",
     "path": "/path/to/resource",
     "httpMethod": "POST",
