@@ -28,6 +28,36 @@ Resources:
         - DynamoDBWritePolicy:
             TableName: !Ref RideLogTable
 
+  GetRideLogHandlerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: RideLog-Lambda-Functions
+      Handler: dev.ericrybarczyk.ridelog.GetRideLogHandler::handleRequest
+      Events:
+        RideLogs:
+          Type: Api
+          Properties:
+            Path: /ridelogs/{userId}/{startDateTime}
+            Method: Get
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref RideLogTable
+
+  GetRideLogListHandlerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: RideLog-Lambda-Functions
+      Handler: dev.ericrybarczyk.ridelog.ListRideLogListHandler::handleRequest
+      Events:
+        RideLogs:
+          Type: Api
+          Properties:
+            Path: /ridelogs/{userId}
+            Method: Get
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref RideLogTable
+
   # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-dynamodb-table.html
   RideLogTable:
     Type: AWS::DynamoDB::Table
@@ -62,4 +92,4 @@ Outputs:
     Value: !GetAtt CreateRideLogHandlerFunction.Arn
   CreateRideLogHandlerFunctionIamRole:
     Description: "Implicit IAM Role created for CreateRideLogHandler Lambda Function"
-    Value: !GetAtt CreateRideLogHandlerFunction.Arn
+    Value: !GetAtt CreateRideLogHandlerFunctionRole.Arn
